@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
@@ -6,12 +5,18 @@ import Footer from "@/components/layout/Footer";
 import PageHeader from "@/components/layout/PageHeader";
 import ProductCard, { ProductProps } from "@/components/ui/ProductCard";
 import { Button } from "@/components/ui/button";
-import { produtos } from "@/data/produtos";
+import { ProductService } from "@/services/productService";
 
 const CardapioPage = () => {
   const [searchParams] = useSearchParams();
-  const [filteredProducts, setFilteredProducts] = useState<ProductProps[]>(produtos);
+  const [filteredProducts, setFilteredProducts] = useState<ProductProps[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>("todos");
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Load products on component mount
+  useEffect(() => {
+    loadProducts();
+  }, []);
   
   // Filter products based on URL parameter
   useEffect(() => {
@@ -20,17 +25,28 @@ const CardapioPage = () => {
       filterProducts(tipoParam);
       setActiveFilter(tipoParam);
     } else {
-      setFilteredProducts(produtos);
-      setActiveFilter("todos");
+      filterProducts("todos");
     }
   }, [searchParams]);
+  
+  // Load all products
+  const loadProducts = () => {
+    try {
+      const products = ProductService.getAllProducts();
+      setFilteredProducts(products);
+    } catch (error) {
+      console.error("Erro ao carregar produtos:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   // Filter products by type
   const filterProducts = (tipo: string) => {
     if (tipo === "todos") {
-      setFilteredProducts(produtos);
+      loadProducts();
     } else {
-      const filtered = produtos.filter(produto => produto.tipo === tipo);
+      const filtered = ProductService.getProductsByType(tipo as ProductProps["tipo"]);
       setFilteredProducts(filtered);
     }
     setActiveFilter(tipo);
@@ -88,7 +104,12 @@ const CardapioPage = () => {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {filteredProducts.length > 0 ? (
+          {isLoading ? (
+            <div className="col-span-full text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sorbet-orange mx-auto"></div>
+              <p className="mt-4 text-gray-600">Carregando produtos...</p>
+            </div>
+          ) : filteredProducts.length > 0 ? (
             filteredProducts.map((produto) => (
               <ProductCard key={produto.id} produto={produto} />
             ))

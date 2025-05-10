@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -14,13 +13,22 @@ const PromocoesPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    // Load promotional products and active promotions
-    const products = ProductService.getPromotionalProducts();
-    const activePromos = PromotionService.getActivePromotions();
-    
-    setPromotionalProducts(products);
-    setPromotions(activePromos);
-    setIsLoading(false);
+    const loadData = async () => {
+      try {
+        // Load promotional products and active promotions
+        const products = ProductService.getPromotionalProducts();
+        const activePromos = PromotionService.getActivePromotions();
+        
+        setPromotionalProducts(products);
+        setPromotions(activePromos);
+      } catch (error) {
+        console.error("Erro ao carregar promoções:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
   
   return (
@@ -66,7 +74,8 @@ const PromocoesPage = () => {
           
           {isLoading ? (
             <div className="text-center py-12">
-              <p>Carregando promoções...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sorbet-orange mx-auto"></div>
+              <p className="mt-4 text-gray-600">Carregando promoções...</p>
             </div>
           ) : promotionalProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -75,9 +84,9 @@ const PromocoesPage = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16">
+            <div className="text-center py-16 bg-sorbet-peach/10 rounded-xl">
               <h3 className="text-xl text-gray-600 mb-2">
-                Não há promoções no momento.
+                Não há produtos em promoção no momento.
               </h3>
               <p className="text-gray-500">
                 Volte em breve para conferir nossas próximas ofertas especiais.

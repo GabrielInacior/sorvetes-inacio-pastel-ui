@@ -1,7 +1,10 @@
-
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
+import { CartService } from '@/services/cartService';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export interface ProductProps {
   id: string;
@@ -15,6 +18,23 @@ export interface ProductProps {
 }
 
 const ProductCard = ({ produto }: { produto: ProductProps }) => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      toast.error("Você precisa estar logado para adicionar produtos ao carrinho");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      CartService.addToCart(produto.id);
+    } catch (error) {
+      console.error("Erro ao adicionar ao carrinho:", error);
+    }
+  };
+
   return (
     <div className="product-card bg-white rounded-2xl shadow-md overflow-hidden">
       <div className="relative h-48 overflow-hidden">
@@ -73,6 +93,7 @@ const ProductCard = ({ produto }: { produto: ProductProps }) => {
           <Button 
             size="icon" 
             className="bg-sorbet-orange hover:bg-sorbet-orange/90 text-white rounded-full h-9 w-9"
+            onClick={handleAddToCart}
           >
             <ShoppingCart className="h-5 w-5" />
           </Button>

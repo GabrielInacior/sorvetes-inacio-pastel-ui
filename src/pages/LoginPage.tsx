@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -165,6 +164,11 @@ const LoginPage = () => {
                   
                   <TabsContent value="funcionario">
                     <CardContent className="pt-6">
+                      <div className="mb-4 p-3 bg-sorbet-peach/10 rounded-lg text-sm text-sorbet-dark">
+                        <p className="font-medium mb-1">Credenciais padrão:</p>
+                        <p>Email: funcionario@sorvetesinacio.com</p>
+                        <p>Senha: func123</p>
+                      </div>
                       <form onSubmit={handleLogin}>
                         <div className="space-y-4">
                           <div className="space-y-2">
@@ -172,7 +176,7 @@ const LoginPage = () => {
                             <Input
                               id="employee-email"
                               type="email"
-                              placeholder="funcionario@sorveteinacio.com"
+                              placeholder="funcionario@sorvetesinacio.com"
                               value={email}
                               onChange={(e) => setEmail(e.target.value)}
                               required
@@ -200,6 +204,11 @@ const LoginPage = () => {
                   
                   <TabsContent value="administrador">
                     <CardContent className="pt-6">
+                      <div className="mb-4 p-3 bg-sorbet-peach/10 rounded-lg text-sm text-sorbet-dark">
+                        <p className="font-medium mb-1">Credenciais padrão:</p>
+                        <p>Email: admin@sorvetesinacio.com</p>
+                        <p>Senha: admin123</p>
+                      </div>
                       <form onSubmit={handleLogin}>
                         <div className="space-y-4">
                           <div className="space-y-2">
@@ -207,7 +216,7 @@ const LoginPage = () => {
                             <Input
                               id="admin-email"
                               type="email"
-                              placeholder="admin@sorveteinacio.com"
+                              placeholder="admin@sorvetesinacio.com"
                               value={email}
                               onChange={(e) => setEmail(e.target.value)}
                               required

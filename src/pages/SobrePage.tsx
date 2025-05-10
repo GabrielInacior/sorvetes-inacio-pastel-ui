@@ -2,6 +2,7 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageHeader from "@/components/layout/PageHeader";
+import LogoSorveteria from "@/assets/LogoSorveteria.png";
 
 const SobrePage = () => {
   return (
@@ -19,7 +20,7 @@ const SobrePage = () => {
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="lg:w-1/2">
               <img 
-                src="https://images.unsplash.com/photo-1585936018814-73aa4dc9ea1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                src={LogoSorveteria} 
                 alt="História da Sorvetes Inacio" 
                 className="rounded-2xl shadow-lg w-full h-auto object-cover"
               />

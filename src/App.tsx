@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -17,6 +16,7 @@ import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProdutos from "./pages/admin/AdminProdutos";
+import AdminPedidos from "./pages/admin/AdminPedidos";
 import AdminLayout from "./pages/admin/AdminLayout";
 import ProdutoDetailPage from "./pages/ProdutoDetailPage";
 
@@ -44,6 +44,7 @@ const App: React.FC = () => (
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="produtos" element={<AdminProdutos />} />
+                <Route path="pedidos" element={<AdminPedidos />} />
               </Route>
               
               <Route path="*" element={<NotFound />} />

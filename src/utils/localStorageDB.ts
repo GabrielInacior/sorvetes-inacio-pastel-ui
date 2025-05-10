@@ -1,5 +1,5 @@
-
 import { ProductProps } from "@/components/ui/ProductCard";
+import { produtos } from "@/data/produtos";
 
 // Types for our data model
 export type UserType = "cliente" | "funcionario" | "administrador";
@@ -69,18 +69,18 @@ let ordersCache: Order[] = [];
 
 // Initialize data if localStorage is empty
 export const initializeData = () => {
-  // Check if data exists, if not, initialize with sample data
+  // Initialize products if not exists
   if (!localStorage.getItem("products")) {
-    // Use existing produtos data as initial data
-    localStorage.setItem("products", JSON.stringify([]));
+    localStorage.setItem("products", JSON.stringify(produtos));
   }
   
+  // Initialize users with default admin and employee if not exists
   if (!localStorage.getItem("users")) {
-    const sampleUsers: User[] = [
+    const defaultUsers = [
       {
         id: "1",
         nome: "Administrador",
-        email: "admin@sorveteinacio.com",
+        email: "admin@sorvetesinacio.com",
         senha: "admin123",
         tipo: "administrador",
         dataCriacao: new Date().toISOString(),
@@ -88,60 +88,61 @@ export const initializeData = () => {
       {
         id: "2",
         nome: "Funcionário",
-        email: "funcionario@sorveteinacio.com",
+        email: "funcionario@sorvetesinacio.com",
         senha: "func123",
         tipo: "funcionario",
         dataCriacao: new Date().toISOString(),
-      },
-      {
-        id: "3",
-        nome: "Cliente",
-        email: "cliente@exemplo.com",
-        senha: "cliente123",
-        tipo: "cliente",
-        dataCriacao: new Date().toISOString(),
-      },
+      }
     ];
-    localStorage.setItem("users", JSON.stringify(sampleUsers));
+    localStorage.setItem("users", JSON.stringify(defaultUsers));
+  } else {
+    // Check if default users exist, if not add them
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const hasAdmin = users.some((user: User) => user.email === "admin@sorvetesinacio.com");
+    const hasEmployee = users.some((user: User) => user.email === "funcionario@sorvetesinacio.com");
+    
+    if (!hasAdmin || !hasEmployee) {
+      const defaultUsers = [
+        {
+          id: "1",
+          nome: "Administrador",
+          email: "admin@sorvetesinacio.com",
+          senha: "admin123",
+          tipo: "administrador",
+          dataCriacao: new Date().toISOString(),
+        },
+        {
+          id: "2",
+          nome: "Funcionário",
+          email: "funcionario@sorvetesinacio.com",
+          senha: "func123",
+          tipo: "funcionario",
+          dataCriacao: new Date().toISOString(),
+        }
+      ];
+      
+      // Add only missing default users
+      if (!hasAdmin) users.push(defaultUsers[0]);
+      if (!hasEmployee) users.push(defaultUsers[1]);
+      
+      localStorage.setItem("users", JSON.stringify(users));
+    }
   }
   
+  // Initialize other data if not exists
   if (!localStorage.getItem("messages")) {
     localStorage.setItem("messages", JSON.stringify([]));
   }
   
   if (!localStorage.getItem("promotions")) {
-    const today = new Date();
-    const nextMonth = new Date(today);
-    nextMonth.setMonth(today.getMonth() + 1);
-    
-    const samplePromotions: Promotion[] = [
-      {
-        id: "1",
-        titulo: "Verão Refrescante",
-        descricao: "20% de desconto em todos os sorvetes de massa",
-        dataInicio: today.toISOString(),
-        dataFim: nextMonth.toISOString(),
-        tipoDesconto: "percentual",
-        valorDesconto: 20,
-      },
-      {
-        id: "2",
-        titulo: "Sundae em Dobro",
-        descricao: "Compre 1 Sundae e ganhe outro com 50% de desconto",
-        dataInicio: today.toISOString(),
-        dataFim: nextMonth.toISOString(),
-        tipoDesconto: "percentual",
-        valorDesconto: 50,
-      },
-    ];
-    localStorage.setItem("promotions", JSON.stringify(samplePromotions));
+    localStorage.setItem("promotions", JSON.stringify([]));
   }
   
   if (!localStorage.getItem("orders")) {
     localStorage.setItem("orders", JSON.stringify([]));
   }
   
-  // Load all data into the in-memory cache
+  // Refresh caches
   refreshCaches();
 };
 
