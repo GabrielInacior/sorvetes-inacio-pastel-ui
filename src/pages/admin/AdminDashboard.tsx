@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
   Card, 
@@ -22,31 +22,59 @@ import {
   Legend,
 } from "recharts";
 import { Button } from "@/components/ui/button";
-import { produtos } from "@/data/produtos";
+import AdminMessages from "@/components/admin/AdminMessages";
+import { getStats } from "@/utils/localStorageDB";
+import { ProductService } from "@/services/productService";
 
-// Mock data for charts
-const salesData = [
-  { name: "Jan", vendas: 4000 },
-  { name: "Fev", vendas: 3000 },
-  { name: "Mar", vendas: 5000 },
-  { name: "Abr", vendas: 8000 },
-  { name: "Mai", vendas: 7000 },
-  { name: "Jun", vendas: 9000 },
-];
-
-const topProductsData = [
-  { name: "Sorvete de Chocolate", value: 30 },
-  { name: "Açaí Premium", value: 25 },
-  { name: "Sundae Tropical", value: 20 },
-  { name: "Casquinha Mista", value: 15 },
-  { name: "Milkshake", value: 10 },
-];
-
+// Colors for charts
 const COLORS = ["#FEC6A1", "#FFDEE2", "#FDE1D3", "#a67f65", "#f0d2c2"];
 
 const AdminDashboard = () => {
   // State for date range
   const [dateRange, setDateRange] = useState("month");
+  const [stats, setStats] = useState({
+    totalProducts: 0,
+    totalUsers: 0,
+    totalOrders: 0,
+    totalRevenue: 0,
+    topProducts: []
+  });
+  const [products, setProducts] = useState([]);
+  
+  // Load data on component mount
+  useEffect(() => {
+    // Get statistics from our storage
+    const statsData = getStats();
+    setStats(statsData);
+    
+    // Get products for the table
+    const productsData = ProductService.getAllProducts();
+    setProducts(productsData.slice(0, 5)); // Show only 5 most recent
+  }, []);
+  
+  // Mock data for charts based on our stats
+  const salesData = [
+    { name: "Jan", vendas: 4000 },
+    { name: "Fev", vendas: 3000 },
+    { name: "Mar", vendas: 5000 },
+    { name: "Abr", vendas: 8000 },
+    { name: "Mai", vendas: 7000 },
+    { name: "Jun", vendas: 9000 },
+  ];
+  
+  // Format top products data for pie chart
+  const topProductsData = stats.topProducts.length > 0
+    ? stats.topProducts.map(product => ({
+        name: product.nome,
+        value: product.quantidade
+      }))
+    : [
+        { name: "Sorvete de Chocolate", value: 30 },
+        { name: "Açaí Premium", value: 25 },
+        { name: "Sundae Tropical", value: 20 },
+        { name: "Casquinha Mista", value: 15 },
+        { name: "Milkshake", value: 10 },
+      ];
   
   return (
     <div className="p-8">
@@ -83,7 +111,9 @@ const AdminDashboard = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Vendas Totais</CardDescription>
-            <CardTitle className="text-3xl font-bold text-sorbet-dark">R$ 25.680,00</CardTitle>
+            <CardTitle className="text-3xl font-bold text-sorbet-dark">
+              R$ {stats.totalRevenue.toFixed(2)}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-green-600">+12% em relação ao mês anterior</p>
@@ -93,7 +123,9 @@ const AdminDashboard = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Pedidos</CardDescription>
-            <CardTitle className="text-3xl font-bold text-sorbet-dark">345</CardTitle>
+            <CardTitle className="text-3xl font-bold text-sorbet-dark">
+              {stats.totalOrders}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-green-600">+5% em relação ao mês anterior</p>
@@ -103,7 +135,11 @@ const AdminDashboard = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Valor Médio</CardDescription>
-            <CardTitle className="text-3xl font-bold text-sorbet-dark">R$ 74,43</CardTitle>
+            <CardTitle className="text-3xl font-bold text-sorbet-dark">
+              {stats.totalOrders > 0 
+                ? `R$ ${(stats.totalRevenue / stats.totalOrders).toFixed(2)}`
+                : "R$ 0,00"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-green-600">+8% em relação ao mês anterior</p>
@@ -113,7 +149,9 @@ const AdminDashboard = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Novos Clientes</CardDescription>
-            <CardTitle className="text-3xl font-bold text-sorbet-dark">87</CardTitle>
+            <CardTitle className="text-3xl font-bold text-sorbet-dark">
+              {stats.totalUsers}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-green-600">+15% em relação ao mês anterior</p>
@@ -170,77 +208,90 @@ const AdminDashboard = () => {
       </div>
       
       {/* Recent Products */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Produtos Recentes</CardTitle>
-            <Link to="/admin/produtos">
-              <Button variant="link" className="text-sorbet-orange hover:text-sorbet-orange/80">
-                Ver Todos
-              </Button>
-            </Link>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Nome
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Tipo
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Preço
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {produtos.slice(0, 5).map((produto) => (
-                  <tr key={produto.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 flex-shrink-0">
-                          <img className="h-10 w-10 rounded-full object-cover" src={produto.imagem} alt={produto.nome} />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{produto.nome}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {produto.tipo === 'massa' && 'Sorvete de Massa'}
-                      {produto.tipo === 'casquinha' && 'Casquinha'}
-                      {produto.tipo === 'quilo' && 'Por Quilo'}
-                      {produto.tipo === 'combinação' && 'Combinação'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {produto.promocao && produto.precoPromocional ? (
-                        <div>
-                          <span className="line-through text-gray-400">R$ {produto.preco.toFixed(2)}</span>
-                          <span className="ml-2">R$ {produto.precoPromocional.toFixed(2)}</span>
-                        </div>
-                      ) : (
-                        <span>R$ {produto.preco.toFixed(2)}</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${produto.promocao ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                        {produto.promocao ? 'Promoção' : 'Ativo'}
-                      </span>
-                    </td>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Produtos Recentes</CardTitle>
+              <Link to="/admin/produtos">
+                <Button variant="link" className="text-sorbet-orange hover:text-sorbet-orange/80">
+                  Ver Todos
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Nome
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tipo
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Preço
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {products.length > 0 ? (
+                    products.map((produto) => (
+                      <tr key={produto.id}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="h-10 w-10 flex-shrink-0">
+                              <img className="h-10 w-10 rounded-full object-cover" src={produto.imagem} alt={produto.nome} />
+                            </div>
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-gray-900">{produto.nome}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {produto.tipo === 'massa' && 'Sorvete de Massa'}
+                          {produto.tipo === 'casquinha' && 'Casquinha'}
+                          {produto.tipo === 'quilo' && 'Por Quilo'}
+                          {produto.tipo === 'combinação' && 'Combinação'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {produto.promocao && produto.precoPromocional ? (
+                            <div>
+                              <span className="line-through text-gray-400">R$ {produto.preco.toFixed(2)}</span>
+                              <span className="ml-2">R$ {produto.precoPromocional.toFixed(2)}</span>
+                            </div>
+                          ) : (
+                            <span>R$ {produto.preco.toFixed(2)}</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${produto.promocao ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                            {produto.promocao ? 'Promoção' : 'Ativo'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                        Nenhum produto encontrado
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Messages Card */}
+        <AdminMessages />
+      </div>
     </div>
   );
 };

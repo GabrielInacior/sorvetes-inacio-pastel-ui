@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./components/auth/AuthProvider";
 
 import HomePage from "./pages/HomePage";
 import CardapioPage from "./pages/CardapioPage";
@@ -23,28 +24,30 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/cardapio" element={<CardapioPage />} />
-          <Route path="/produto/:id" element={<ProdutoDetailPage />} />
-          <Route path="/promocoes" element={<PromocoesPage />} />
-          <Route path="/sobre" element={<SobrePage />} />
-          <Route path="/contato" element={<ContatoPage />} />
-          <Route path="/carrinho" element={<CarrinhoPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="produtos" element={<AdminProdutos />} />
-          </Route>
-          
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/cardapio" element={<CardapioPage />} />
+            <Route path="/produto/:id" element={<ProdutoDetailPage />} />
+            <Route path="/promocoes" element={<PromocoesPage />} />
+            <Route path="/sobre" element={<SobrePage />} />
+            <Route path="/contato" element={<ContatoPage />} />
+            <Route path="/carrinho" element={<CarrinhoPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="produtos" element={<AdminProdutos />} />
+            </Route>
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
