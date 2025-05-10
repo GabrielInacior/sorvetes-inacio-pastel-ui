@@ -44,7 +44,7 @@ Siga os passos abaixo para clonar e rodar o projeto localmente:
 
 ```bash
 # 1. Clone o repositório
-git clone <SEU_LINK_DO_REPOSITORIO>
+git clone https://github.com/GabrielInacior/sorvetes-inacio-pastel-ui.git
 
 # 2. Acesse o diretório do projeto
 cd nome-do-projeto
