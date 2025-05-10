@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,19 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Sorvetes Inacio custom colors
+				sorbet: {
+					orange: '#FEC6A1',
+					pink: '#FFDEE2',
+					peach: '#FDE1D3',
+					white: '#FFFFFF',
+					light: '#FFF9F5',
+					dark: '#A67F65',
 				}
+			},
+			fontFamily: {
+				'poppins': ['Poppins', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +97,26 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' },
+				},
+				'wave': {
+					'0%': { transform: 'translateX(0)' },
+					'50%': { transform: 'translateX(-25%)' },
+					'100%': { transform: 'translateX(0)' },
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'float': 'float 3s ease-in-out infinite',
+				'wave': 'wave 15s ease-in-out infinite',
+			},
+			backgroundImage: {
+				'wave-pattern': "url('/wave-pattern.svg')",
+				'gradient-sorbet': 'linear-gradient(90deg, #FEC6A1 0%, #FFDEE2 100%)',
 			}
 		}
 	},
