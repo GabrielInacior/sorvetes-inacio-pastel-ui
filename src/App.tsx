@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,35 +22,37 @@ import ProdutoDetailPage from "./pages/ProdutoDetailPage";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+const App: React.FC = () => (
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/cardapio" element={<CardapioPage />} />
-            <Route path="/produto/:id" element={<ProdutoDetailPage />} />
-            <Route path="/promocoes" element={<PromocoesPage />} />
-            <Route path="/sobre" element={<SobrePage />} />
-            <Route path="/contato" element={<ContatoPage />} />
-            <Route path="/carrinho" element={<CarrinhoPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="produtos" element={<AdminProdutos />} />
-            </Route>
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/cardapio" element={<CardapioPage />} />
+              <Route path="/produto/:id" element={<ProdutoDetailPage />} />
+              <Route path="/promocoes" element={<PromocoesPage />} />
+              <Route path="/sobre" element={<SobrePage />} />
+              <Route path="/contato" element={<ContatoPage />} />
+              <Route path="/carrinho" element={<CarrinhoPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="produtos" element={<AdminProdutos />} />
+              </Route>
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
       </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;
