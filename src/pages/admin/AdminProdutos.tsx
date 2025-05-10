@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -23,10 +24,19 @@ const AdminProdutos = () => {
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   
   // Form state for new and editing products
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    id: string;
+    nome: string;
+    tipo: ProductProps["tipo"]; // Using the type from ProductProps
+    preco: number;
+    descricao: string;
+    imagem: string;
+    promocao: boolean;
+    precoPromocional: number;
+  }>({
     id: "",
     nome: "",
-    tipo: "massa",
+    tipo: "massa", // Default value is one of the allowed types
     preco: 0,
     descricao: "",
     imagem: "",
@@ -68,10 +78,19 @@ const AdminProdutos = () => {
   
   // Handle select change
   const handleSelectChange = (value: string, name: string) => {
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    if (name === "tipo") {
+      // Ensure tipo is one of the valid options
+      const tipoValue = value as ProductProps["tipo"];
+      setFormData({
+        ...formData,
+        [name]: tipoValue,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
   
   // Handle switch change
@@ -123,7 +142,7 @@ const AdminProdutos = () => {
     if (editingProduct) {
       // Update existing product
       const updatedProducts = productsList.map(p => 
-        p.id === formData.id ? { ...formData } : p
+        p.id === formData.id ? formData as ProductProps : p
       );
       setProductsList(updatedProducts);
       toast({
@@ -132,7 +151,7 @@ const AdminProdutos = () => {
       });
     } else {
       // Create new product
-      const newProduct = {
+      const newProduct: ProductProps = {
         ...formData,
         id: Date.now().toString(),
       };
