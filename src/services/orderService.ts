@@ -2,6 +2,8 @@
 // Order service with methods to manage orders
 import { toast } from "sonner";
 import { ProductProps } from "@/components/ui/ProductCard";
+import { CartService } from "./cartService";
+import { AuthService } from "./authService";
 
 // Interface for Order
 export interface Order {
@@ -90,6 +92,38 @@ export const OrderService = {
   // Get orders by status
   getOrdersByStatus: (status: Order['status']): Order[] => {
     return getOrders().filter(order => order.status === status);
+  },
+
+  // Process checkout from cart
+  checkout: (): Order | undefined => {
+    const currentUser = AuthService.getCurrentUser();
+    if (!currentUser) {
+      toast.error("Você precisa estar logado para finalizar a compra.");
+      return undefined;
+    }
+
+    const cart = CartService.getCart();
+    if (cart.items.length === 0) {
+      toast.error("Seu carrinho está vazio.");
+      return undefined;
+    }
+
+    // Format cart items for order
+    const orderItems = cart.items.map(item => ({
+      productId: item.produto.id,
+      quantity: item.quantidade,
+      price: item.produto.precoPromocional || item.produto.preco,
+      name: item.produto.nome
+    }));
+
+    // Create the order
+    const order = OrderService.createOrder(currentUser.id, orderItems);
+
+    // Clear the cart after successful order creation
+    CartService.clearCart();
+    
+    toast.success("Pedido realizado com sucesso!");
+    return order;
   }
 };
 
